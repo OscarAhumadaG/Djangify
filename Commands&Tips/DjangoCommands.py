@@ -38,6 +38,14 @@ python manage.py makemigrations main
 python manage.py shell 
 """
 
+# To create the superuser in the admin tab
+"""
+http://127.0.0.1:8000/admin/
+
+python manage.py createsuperuser
+"""
+
+
 # To add a ToDoList into the database
 """
 from main.models import Item, ToDoList
@@ -61,7 +69,16 @@ t.item_set.get(id=1)
 <Item: Go to the mall>
 """
 
+# To delete a  ToDoList
+"""
+del_object = t.get(id=1)
+del_object.delete()
+"""
 
+
+"""
+quit()
+"""
 
 
 
