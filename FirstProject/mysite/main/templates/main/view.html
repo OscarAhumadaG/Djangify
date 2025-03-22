@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends "main/base.html" %}
+
+{% block title %}
+    View
+{% endblock %}
+
+{% block content %}
+    <!-- Display the user's ToDo lists -->
+    {% for td in user.todolist.all %}
+        <p><a href="/{{ td.id }}">{{ td.name }}</a></p>
+    {% endfor %}
+
+    <!-- Logout form, only visible if the user is authenticated -->
+    {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión</button>
+        </form>
+    {% endif %}
+{% endblock %}
+
+</html>
+

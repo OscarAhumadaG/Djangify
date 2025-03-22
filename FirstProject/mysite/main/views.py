@@ -7,41 +7,51 @@ from .forms import CreateNewList
 def index(response, id):
     ls = ToDoList.objects.get(id=id)
 
-    if response.method == "POST":
-        print(response.POST)
-        if response.POST.get("save"):
-            for item in ls.item_set.all():
-                if response.POST.get("c" +str(item.id)) == "clicked":
-                    item.complete = True
+    if ls in response.user.todolist.all():
+        if response.method == "POST":
+            print(response.POST)
+            if response.POST.get("save"):
+                for item in ls.item_set.all():
+                    if response.POST.get("c" +str(item.id)) == "clicked":
+                        item.complete = True
+                    else:
+                        item.complete = False
+
+                    item.save()
+
+            elif response.POST.get("newItem"):
+                txt = response.POST.get("new")
+
+                if  len(txt) > 2:
+                    ls.item_set.create(text=txt, complete=False)
                 else:
-                    item.complete = False
-
-                item.save()
-
-        elif response.POST.get("newItem"):
-            txt = response.POST.get("new")
-
-            if  len(txt) > 2:
-                ls.item_set.create(text=txt, complete=False)
-            else:
-                print("invalid")
-
-
-    return render(response, "main/list.html", {"ls": ls})
+                    print("invalid")
+        return render(response, "main/list.html", {"ls": ls})
+    return render(response, "main/view.html", {})
 
 def home(response):
     return render(response, "main/home.html", {})
 
+
+# View for creating a new To-Do list
 def create(response):
-    if response.method == "POST":
-        form = CreateNewList(response.POST)
+    if response.method == "POST":  # If the request method is POST (form submission)
+        form = CreateNewList(response.POST)  # Initialize the form with the POST data
 
-        if form.is_valid():
-            n = form.cleaned_data["name"]
+        if form.is_valid():  # Check if the form is valid
+            n = form.cleaned_data["name"]  # Get the cleaned data (name of the list)
             t = ToDoList(name=n)
-            t.save()
+            t.save()  # Save the ToDoList instance to the database
+            response.user.todolist.add(t)
 
-        return HttpResponseRedirect("/%i" %t.id)
-    else:
-        form = CreateNewList()
+            # Redirect to the newly created ToDoList page
+            return HttpResponseRedirect(f"/{t.id}")  # Redirect to the page of the new list using its ID
+
+    else:  # If the request method is not POST (initial page load)
+        form = CreateNewList()  # Create a new empty form
+
+    # Render the create.html template with the form as context
     return render(response, "main/create.html", {"form": form})
+
+def view(response):
+    return render (response, "main/view.html", {})
